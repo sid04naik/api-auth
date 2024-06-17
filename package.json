@@ -8,7 +8,7 @@
 		"start": "npm run shell",
 		"deploy": "firebase deploy --only functions",
 		"logs": "firebase functions:log",
-		"dev": "nodemon node app.js",
+		"dev": "nodemon node .",
 		"lint": "eslint .",
 		"format": "prettier --write ."
 	},
@@ -17,6 +17,7 @@
 	},
 	"main": "app.js",
 	"dependencies": {
+		"body-parser": "^1.20.2",
 		"cors": "^2.8.5",
 		"express": "^4.19.2",
 		"firebase-admin": "^12.1.0",
