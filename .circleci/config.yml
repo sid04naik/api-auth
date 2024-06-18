@@ -49,7 +49,9 @@ workflows:
   test-build-n-deploy-image:
     jobs:
     - run-prebuild-installation
-    - run-unit-test
+    - run-unit-test:
+        requires:
+        - run-prebuild-installation
     - deploy:
         requires:
         - run-prebuild-installation
