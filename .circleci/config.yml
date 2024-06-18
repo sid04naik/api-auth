@@ -29,7 +29,7 @@ jobs:
     - checkout
     - run:
         name: Run tests
-        command: npm test
+        command: npm run test
   deploy:
     docker:
     - image: cimg/node:lts
