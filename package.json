@@ -10,7 +10,8 @@
 		"logs": "firebase functions:log",
 		"dev": "nodemon node .",
 		"lint": "eslint .",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"test": "jest"
 	},
 	"engines": {
 		"node": "18"
