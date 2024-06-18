@@ -2,45 +2,64 @@ version: 2
 jobs:
   run-prebuild-installation:
     docker:
-    - image: cimg/node:lts
+      - image: cimg/node:lts
     resource_class: small
     steps:
-    - checkout
-    - run:
-        name: Install dependencies
-        command: npm install
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
+      - run:
+          name: Install dependencies
+          command: npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
+
   run-unit-test:
     docker:
-    - image: cimg/node:lts
+      - image: cimg/node:lts
     resource_class: small
     steps:
-    - checkout
-    - run:
-        name: Run tests
-        command: npm run test
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
+      - run:
+          name: Run tests
+          command: npm run test
+
   deploy:
     docker:
-    - image: cimg/node:lts
+      - image: cimg/node:lts
     resource_class: small
     steps:
-    - checkout
-    - run:
-        name: Install dependencies
-        command: npm install
-    - run:
-        name: Install Firebase CLI
-        command: npm install firebase-tools
-    - run:
-        name: Deploy to Firebase
-        command: firebase deploy --only functions,firestore --token $FIREBASE_TOKEN
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Install Firebase CLI
+          command: npx firebase-tools
+      - run:
+          name: Deploy to Firebase
+          command: npx firebase deploy --only functions,firestore --token $FIREBASE_TOKEN
+
 workflows:
+  version: 2
   test-build-n-deploy-image:
     jobs:
-    - run-prebuild-installation
-    - run-unit-test:
-        requires:
-        - run-prebuild-installation
-    - deploy:
-        requires:
-        - run-prebuild-installation
-  version: 2
+      - run-prebuild-installation
+      - run-unit-test:
+          requires:
+            - run-prebuild-installation
+      - deploy:
+          requires:
+            - run-prebuild-installation
