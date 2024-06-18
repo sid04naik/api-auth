@@ -10,7 +10,7 @@ router.get('/health', (request, response) => {
 
 router.get('/', (request, response) => {
 	logger.info('GET');
-	return response.send("Hello").status(200);
+	return response.send('Hello').status(200);
 });
 
 export default router;

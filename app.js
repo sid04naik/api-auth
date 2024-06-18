@@ -15,7 +15,6 @@
 // 	logger.info(`Server is running on ${PORT}`);
 // });
 
-
 import app from './src/config/expressConfig.js'; // Importing the Express app from expressConfig
 import { https } from './src/config/firebaseConfig.js'; // Importing the Express app from expressConfig
 import router from './src/routes/routes.js'; // Importing the router and healthRoutes from routes
@@ -26,8 +25,7 @@ const PORT = 9001;
 app.use(router);
 
 app.listen(PORT, () => {
-  console.log(`Server is running on ${PORT}`);
+	console.log(`Server is running on ${PORT}`);
 });
-
 
 export const auth = https.onRequest(app);
