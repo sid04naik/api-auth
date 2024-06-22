@@ -79,3 +79,5 @@ workflows:
             - run-functional-tests
       - deploy:
           name: deploy-to-firebase
+          requires:
+            - hold
