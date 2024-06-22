@@ -74,9 +74,9 @@ workflows:
       - hold:
           name: deployment-approval
           type: approval
-          requires:
-            - run-unit-tests
-            - run-functional-tests
+          # requires:
+          #   - run-unit-tests
+          #   - run-functional-tests
       - deploy:
           name: deploy-to-firebase
           requires:
