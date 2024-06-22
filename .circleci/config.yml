@@ -1,6 +1,13 @@
-version: 2
+version: 2.1
+default: &defaults
+k6_performance_tests: &k6_performance_tests
+  run:
+    name: Running k6 tests
+    command: |
+      docker pull loadimpact/k6:latest
+      docker run --env ECS_CLUSTER_NAME --env DOMAIN -i -v $HOME/project:/load/ loadimpact/k6:latest run /load/test/perf/perf.js
 jobs:
-  run-prebuild-installation:
+  prebuild-installation:
     docker:
       - image: cimg/node:lts
     resource_class: small
@@ -13,25 +20,38 @@ jobs:
       - run:
           name: Install dependencies
           command: npm install
+      - persist_to_workspace:
+          root: .
+          paths:
+            - "*"
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package-lock.json" }}
-
-  run-unit-test:
+  unit-tests:
     docker:
       - image: cimg/node:lts
     resource_class: small
     steps:
+      - attach_workspace:
+          at: .
+      - run: npm run test
+  functional-tests:
+    docker:
+      - image: cimg/node:lts
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: .
+      - run: npm run func
+  performance-tests:
+    <<: *defaults
+    machine:
+      image: ubuntu-2004:current
+    resource_class: medium
+    steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package-lock.json" }}
-            - v1-dependencies-
-      - run:
-          name: Run tests
-          command: npm run test
-
+      - *k6_performance_tests
   deploy:
     docker:
       - image: cimg/node:lts
@@ -50,16 +70,27 @@ jobs:
           command: npx firebase-tools
       - run:
           name: Deploy to Firebase
-          command: npx firebase deploy --only functions,firestore --token $FIREBASE_TOKEN
+          command: npx firebase deploy --only functions --token $FIREBASE_TOKEN
 
 workflows:
-  version: 2
   test-build-n-deploy-image:
     jobs:
-      - run-prebuild-installation
-      - run-unit-test:
+      - prebuild-installation:
+          name: run-prebuild-installation
+      - unit-tests:
+          name: run-unit-tests
           requires:
             - run-prebuild-installation
+      - functional-tests:
+          context: dev
+          name: run-functional-tests
+          requires:
+            - run-prebuild-installation
+      - hold:
+          name: deployment-approval
+          type: approval
+          requires:
+            - run-unit-tests
+            - run-functional-tests
       - deploy:
-          requires:
-            - run-prebuild-installation
+          name: deploy-to-firebase

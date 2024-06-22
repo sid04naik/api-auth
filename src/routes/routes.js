@@ -1,6 +1,14 @@
 import express from 'express';
 import { logger } from '../config/firebaseConfig.js'; // Importing logger from config
-
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+import { fileURLToPath } from 'url';
+import path from 'path';
+// Get the file path of the current module
+const __filename = fileURLToPath(import.meta.url);
+// Get the directory name of the current module
+const __dirname = path.dirname(__filename);
+const swaggerDocument = YAML.load(path.join(__dirname, '../../swagger/auth.yaml'));
 const router = express.Router();
 
 router.get('/health', (request, response) => {
@@ -12,5 +20,10 @@ router.get('/', (request, response) => {
 	logger.info('GET');
 	return response.send('Hello').status(200);
 });
+
+// Serve the Swagger UI using the specified route
+router.use('/', swaggerUi.serve);
+router.get('/', swaggerUi.setup(swaggerDocument));
+
 
 export default router;
