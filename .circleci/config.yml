@@ -55,7 +55,7 @@ jobs:
       #     command: npm install -g firebase-tools
       - run:
           name: Deploy to Firebase
-          command: firebase deploy --only functions --token $FIREBASE_TOKEN
+          command: npx firebase deploy --only functions --token $FIREBASE_TOKEN
 
 workflows:
   test-build-n-deploy-image:
