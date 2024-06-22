@@ -1,0 +1,113 @@
+version: 2.1
+jobs:
+  prebuild-installation:
+    docker:
+      - image: cimg/node:lts
+    resource_class: small
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
+      - run:
+          name: Install dependencies
+          command: npm install
+      - persist_to_workspace:
+          root: .
+          paths:
+            - "*"
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
+  unit-tests:
+    docker:
+      - image: cimg/node:lts
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: .
+      - run: npm run test
+  functional-tests:
+    docker:
+      - image: cimg/node:lts
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: .
+      - run: npm run func
+  deploy-dev:
+    docker:
+      - image: cimg/node:lts
+    resource_class: small
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Deploy to dev Firebase
+          command: |
+            echo "Deploying to dev",
+            npx firebase use --add dev
+            npx firebase deploy --only functions --token $FIREBASE_TOKEN
+  deploy-prod:
+    docker:
+      - image: cimg/node:lts
+    resource_class: small
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Deploy to prod Firebase
+          command: |
+            echo "Deploying to Production",
+            npx firebase use --add prod
+            npx firebase deploy --only functions --token $FIREBASE_TOKEN
+workflows:
+  test-build-n-deploy-image:
+    jobs:
+      - prebuild-installation:
+          name: run-prebuild-installation
+      - unit-tests:
+          name: run-unit-tests
+          requires:
+            - run-prebuild-installation
+      - functional-tests:
+          context: dev
+          name: run-functional-tests
+          requires:
+            - run-prebuild-installation
+      - hold:
+          name: deployment-approval-dev
+          type: approval
+          requires:
+            - run-prebuild-installation
+            - run-unit-tests
+            - run-functional-tests
+      - deploy-dev:
+          name: deploy-to-dev
+          requires:
+            -  deployment-approval-dev
+      - hold:
+          name: deployment-approval-prod
+          type: approval
+          filters:
+            branches:
+              only:
+                - main
+      - deploy-prod:
+          name: deploy-to-prod
+          requires:
+            -  deployment-approval-prod
