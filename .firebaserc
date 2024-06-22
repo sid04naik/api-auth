@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "cloud-trackrapp"
+    "default": "cloud-trackrapp-dev",
+    "dev": "cloud-trackrapp-dev",
+    "prod": "cloud-trackrapp"
   }
 }

@@ -37,7 +37,7 @@ jobs:
       - attach_workspace:
           at: .
       - run: npm run func
-  deploy:
+  deploy-dev:
     docker:
       - image: cimg/node:lts
     resource_class: small
@@ -51,9 +51,30 @@ jobs:
           name: Install dependencies
           command: npm install
       - run:
-          name: Deploy to Firebase
-          command: npx firebase deploy --only functions --token $FIREBASE_TOKEN
-
+          name: Deploy to dev Firebase
+          command: |
+            echo "Deploying to dev",
+            npx firebase use --add dev
+            npx firebase deploy --only functions --token $FIREBASE_TOKEN
+  deploy-prod:
+    docker:
+      - image: cimg/node:lts
+    resource_class: small
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Deploy to prod Firebase
+          command: |
+            echo "Deploying to Production",
+            npx firebase use --add prod
+            npx firebase deploy --only functions --token $FIREBASE_TOKEN
 workflows:
   test-build-n-deploy-image:
     jobs:
@@ -69,17 +90,26 @@ workflows:
           requires:
             - run-prebuild-installation
       - hold:
-          name: deployment-approval
+          name: deployment-approval-dev
           type: approval
           requires:
             - run-prebuild-installation
             - run-unit-tests
             - run-functional-tests
+      - deploy-dev:
+          name: deploy-to-dev
+          requires:
+            -  deployment-approval-dev
+      - hold:
+          name: deployment-approval-prod
+          type: approval
+          requires:
+            - deploy-to-dev
           filters:
             branches:
               only:
                 - main
-      - deploy:
-          name: deploy-to-firebase
+      - deploy-prod:
+          name: deploy-to-prod
           requires:
-            - deployment-approval
+            -  deployment-approval-prod
