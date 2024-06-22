@@ -4,14 +4,16 @@
 	"type": "module",
 	"scripts": {
 		"serve": "firebase emulators:start --only functions",
-		"shell": "firebase functions:shell",
-		"start": "npm run shell",
 		"deploy": "firebase deploy --only functions",
 		"logs": "firebase functions:log",
+		"shell": "firebase functions:shell",
+		"start": "npm run shell",
 		"dev": "nodemon node .",
-		"lint": "eslint .",
 		"format": "prettier --write .",
-		"test": "jest"
+		"lint": "eslint .",
+		"test": "jest",
+		"func": "echo 'No functional Test'; exit 1"
+
 	},
 	"engines": {
 		"node": "20"

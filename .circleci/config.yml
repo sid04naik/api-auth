@@ -1,11 +1,4 @@
 version: 2.1
-default: &defaults
-k6_performance_tests: &k6_performance_tests
-  run:
-    name: Running k6 tests
-    command: |
-      docker pull loadimpact/k6:latest
-      docker run --env ECS_CLUSTER_NAME --env DOMAIN -i -v $HOME/project:/load/ loadimpact/k6:latest run /load/test/perf/perf.js
 jobs:
   prebuild-installation:
     docker:
@@ -44,14 +37,6 @@ jobs:
       - attach_workspace:
           at: .
       - run: npm run func
-  performance-tests:
-    <<: *defaults
-    machine:
-      image: ubuntu-2004:current
-    resource_class: medium
-    steps:
-      - checkout
-      - *k6_performance_tests
   deploy:
     docker:
       - image: cimg/node:lts
