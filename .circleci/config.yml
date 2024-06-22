@@ -103,8 +103,6 @@ workflows:
       - hold:
           name: deployment-approval-prod
           type: approval
-          requires:
-            - deploy-to-dev
           filters:
             branches:
               only:
