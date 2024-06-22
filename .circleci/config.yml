@@ -50,9 +50,6 @@ jobs:
       - run:
           name: Install dependencies
           command: npm install
-      # - run:
-      #     name: Install Firebase CLI
-      #     command: npm install -g firebase-tools
       - run:
           name: Deploy to Firebase
           command: npx firebase deploy --only functions --token $FIREBASE_TOKEN
@@ -62,22 +59,26 @@ workflows:
     jobs:
       - prebuild-installation:
           name: run-prebuild-installation
-      # - unit-tests:
-      #     name: run-unit-tests
-      #     requires:
-      #       - run-prebuild-installation
-      # - functional-tests:
-      #     context: dev
-      #     name: run-functional-tests
-      #     requires:
-      #       - run-prebuild-installation
+      - unit-tests:
+          name: run-unit-tests
+          requires:
+            - run-prebuild-installation
+      - functional-tests:
+          context: dev
+          name: run-functional-tests
+          requires:
+            - run-prebuild-installation
       - hold:
           name: deployment-approval
           type: approval
           requires:
             - run-prebuild-installation
-          #   - run-unit-tests
-          #   - run-functional-tests
+            - run-unit-tests
+            - run-functional-tests
+          filters:
+            branches:
+              only:
+                - main
       - deploy:
           name: deploy-to-firebase
           requires:
