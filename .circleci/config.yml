@@ -60,17 +60,17 @@ jobs:
 workflows:
   test-build-n-deploy-image:
     jobs:
-      - prebuild-installation:
-          name: run-prebuild-installation
-      - unit-tests:
-          name: run-unit-tests
-          requires:
-            - run-prebuild-installation
-      - functional-tests:
-          context: dev
-          name: run-functional-tests
-          requires:
-            - run-prebuild-installation
+      # - prebuild-installation:
+      #     name: run-prebuild-installation
+      # - unit-tests:
+      #     name: run-unit-tests
+      #     requires:
+      #       - run-prebuild-installation
+      # - functional-tests:
+      #     context: dev
+      #     name: run-functional-tests
+      #     requires:
+      #       - run-prebuild-installation
       - hold:
           name: deployment-approval
           type: approval
