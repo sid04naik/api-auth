@@ -6,4 +6,4 @@ app.listen(PORT, () => {
 	console.log(`Server is running on ${PORT}`);
 });
 
-export const auth = https.onRequest(app);
+export const docs = https.onRequest(app);
