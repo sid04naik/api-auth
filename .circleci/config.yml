@@ -97,15 +97,19 @@ workflows:
          name: run-code-format
          requires:
          - run-prebuild-installation
+         filters:
+            branches:
+              ignore:
+                - main
       - unit-tests:
           name: run-unit-tests
           requires:
-            - run-code-format
+            - run-prebuild-installation
       - functional-tests:
           context: dev
           name: run-functional-tests
           requires:
-           - run-code-format
+           - run-prebuild-installation
       - hold:
           name: deployment-approval-dev
           type: approval
@@ -114,13 +118,26 @@ workflows:
             - run-code-format
             - run-unit-tests
             - run-functional-tests
+          filters:
+            branches:
+              ignore:
+                - main
       - deploy-dev:
           name: deploy-to-dev
           requires:
             - deployment-approval-dev
+          filters:
+            branches:
+              ignore:
+                - main
       - hold:
           name: deployment-approval-prod
           type: approval
+          requires:
+            - run-prebuild-installation
+            - run-code-format
+            - run-unit-tests
+            - run-functional-tests
           filters:
             branches:
               only:
@@ -129,3 +146,7 @@ workflows:
           name: deploy-to-prod
           requires:
             - deployment-approval-prod
+          filters:
+            branches:
+              only:
+                - main
