@@ -8,7 +8,7 @@
 		"logs": "firebase functions:log",
 		"shell": "firebase functions:shell",
 		"start": "npm run shell",
-		"dev": "NODE_ENV=dev nodemon index.mjs",
+		"dev": "NODE_ENV=dev nodemon index.js",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
 		"format": "prettier --write .",
@@ -23,7 +23,7 @@
 	"engines": {
 		"node": "20"
 	},
-	"main": "index.mjs",
+	"main": "index.js",
 	"dependencies": {
 		"body-parser": "^1.20.2",
 		"cors": "^2.8.5",
@@ -58,6 +58,7 @@
 	"homepage": "https://github.com/sid04naik/api-auth#readme",
 	"private": true,
 	"imports": {
-		"#config": "./src/config/index.mjs"
+		"#config": "./src/config/index.js",
+		"#expressApp": "./src/app.js"
 	}
 }

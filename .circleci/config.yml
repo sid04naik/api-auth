@@ -54,8 +54,8 @@ jobs:
           name: Deploy to dev Firebase
           command: |
             echo "Deploying to dev",
-            # npx firebase use --add dev
-            # npx firebase deploy --only functions --token $FIREBASE_TOKEN
+            npx firebase use --add dev
+            npx firebase deploy --only functions --token $FIREBASE_TOKEN
   deploy-prod:
     docker:
       - image: cimg/node:lts

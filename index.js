@@ -1,5 +1,5 @@
-import app from "./src/app.mjs";
-import { https } from "./src/config/index.mjs";
+import app from "#expressApp";
+import { https } from "#config";
 
 const PORT = 9001;
 app.listen(PORT, () => {

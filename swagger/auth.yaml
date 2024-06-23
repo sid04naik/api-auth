@@ -11,7 +11,9 @@ info:
 servers:
   - url: "http://localhost:9001"
     description: Local server
-  - url: "http://127.0.0.1:9001/cloud-trackrapp/us-central1/auth"
+  - url: "http://127.0.0.1:9001/cloud-trackrapp-dev/us-central1/auth"
+    description: Emulator server
+  - url: "https://us-central1-cloud-trackrapp-dev.cloudfunctions.net/auth"
     description: Dev server
 paths:
   /health:

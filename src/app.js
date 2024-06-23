@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import router from "./routes/routes.mjs"; // Importing the router and healthRoutes from routes
+import router from "./routes/v1/index.js";
 
 const app = express();
 
