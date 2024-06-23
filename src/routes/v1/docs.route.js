@@ -13,8 +13,11 @@ const router = express.Router();
 
 // Serve the Swagger UI using the specified route
 router.use("/", swaggerUi.serve);
-router.get("/", swaggerUi.setup(swaggerDocument,{
-	explorer: true,
-}));
+router.get(
+	"/",
+	swaggerUi.setup(swaggerDocument, {
+		explorer: true,
+	}),
+);
 
 export default router;

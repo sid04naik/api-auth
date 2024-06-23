@@ -1,3 +1,3 @@
-import {https, logger} from "firebase-functions";
+import { https, logger } from "firebase-functions";
 
-export {https, logger}
+export { https, logger };
