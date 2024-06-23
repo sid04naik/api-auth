@@ -21,6 +21,19 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package-lock.json" }}
+  code-format:
+    docker:
+      - image: cimg/node:lts
+    resource_class: small
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Formatting Code
+          command: |
+            echo "Formatting Code",
+            npm run lint:fix
+            npm run prettier:fix
   unit-tests:
     docker:
       - image: cimg/node:lts
@@ -54,8 +67,8 @@ jobs:
           name: Deploy to dev Firebase
           command: |
             echo "Deploying to dev",
-            npx firebase use --add dev
-            npx firebase deploy --only functions --token $FIREBASE_TOKEN
+            # npx firebase use --add dev
+            # npx firebase deploy --only functions --token $FIREBASE_TOKEN
   deploy-prod:
     docker:
       - image: cimg/node:lts
@@ -73,33 +86,38 @@ jobs:
           name: Deploy to prod Firebase
           command: |
             echo "Deploying to Production",
-            npx firebase use --add prod
-            npx firebase deploy --only functions --token $FIREBASE_TOKEN
+            # npx firebase use --add prod
+            # npx firebase deploy --only functions --token $FIREBASE_TOKEN
 workflows:
   test-build-n-deploy-image:
     jobs:
       - prebuild-installation:
           name: run-prebuild-installation
+      - code-format:
+         name: run-code-format
+         requires:
+         - run-prebuild-installation
       - unit-tests:
           name: run-unit-tests
           requires:
-            - run-prebuild-installation
+            - run-code-format
       - functional-tests:
           context: dev
           name: run-functional-tests
           requires:
-            - run-prebuild-installation
+           - run-code-format
       - hold:
           name: deployment-approval-dev
           type: approval
           requires:
             - run-prebuild-installation
+            - run-code-format
             - run-unit-tests
             - run-functional-tests
       - deploy-dev:
           name: deploy-to-dev
           requires:
-            -  deployment-approval-dev
+            - deployment-approval-dev
       - hold:
           name: deployment-approval-prod
           type: approval
@@ -110,4 +128,4 @@ workflows:
       - deploy-prod:
           name: deploy-to-prod
           requires:
-            -  deployment-approval-prod
+            - deployment-approval-prod
