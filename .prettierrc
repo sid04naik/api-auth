@@ -4,7 +4,7 @@
 	"endOfLine": "lf",
 	"trailingComma": "all",
 	"tabWidth": 2,
-	"printWidth": 80,
+	"printWidth": 125,
 	"bracketSpacing": true,
 	"useTabs": true
 }
